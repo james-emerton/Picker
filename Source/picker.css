@@ -1,0 +1,24 @@
+.picker-sizable
+{
+    position: absolute !important;
+    left: -1000000px !important;
+    top: -1000000px !important;
+    display: block !important;
+}
+.picker-container
+{
+    width: 200px;
+    height: 200px;
+    cursor: default;    
+    background-color: #fff;
+    
+    -moz-border-radius: 5px; /* FF1+ */
+    -webkit-border-radius: 5px; /* Saf3+, Chrome */
+    border-radius: 5px; /* Opera 10.5, IE 9 */
+    
+    -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, .5); /* FF3.5+ */
+    -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, .5); /* Saf3.0+, Chrome */    
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, .5); /* Opera 10.5, IE 9.0 */
+    filter:  progid:DXImageTransform.Microsoft.dropshadow(OffX=0px, OffY=2px, Color='#666666'); /* IE6,IE7 */
+    -ms-filter: "progid:DXImageTransform.Microsoft.dropshadow(OffX=0px, OffY=2px, Color='#666666')"; /* IE8 */
+}  
