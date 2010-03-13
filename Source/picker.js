@@ -11,7 +11,7 @@ requires:
 - core/1.2.4: Class.Extras
 - core/1.2.4: Element.Dimensions
 
-provides: [TimePicker]
+provides: [Picker]
 
 ...
 */

@@ -1,24 +1,47 @@
-Time Picker
-===========
+Picker
+======
 
-This class provides a simple, easy-to-use time picker form control.
+This class is the basis for TimePicker, ColorPicker and DatePicker classes.
 
-![Screenshot](http://www.sixtyseconds.co.za/playground/timepicker/screen.png)
+![Screenshot](http://www.sixtyseconds.co.za/playground/picker/screen.png)
 
 How to use
 ----------
 
     window.addEvent('domready', function() {
-        var pick = document.id('pick'),
-            timepicker = new TimePicker(pick, {
+        var log = document.id('log'),
+            pick = document.id('pick'),
+            picker = new Picker(pick, {
+                /*'position':
+                {
+                    'left': 'left',
+                    'top': 'bottom'
+                },*/
+                'onTrigger': function(e)
+                {
+                    e.stop();
+                    log.innerHTML += 'onTrigger fired<br />';
+                },
+                'onLoad': function()
+                {
+                    log.innerHTML += 'onLoad fired<br />';
+                },
+                'onClick': function(e)
+                {
+                    log.innerHTML += 'onClick fired<br />';
+                    picker.hide();
+                },
+                'onShow': function()
+                {
+                    log.innerHTML += 'onShow fired<br />';
+                },
                 'onHide': function()
                 {
-                    pick.set('value', (this.hour || '00') + ':' + (this.minute || '00'));
+                    log.innerHTML += 'onHide fired<br />';
+                },
+                'onPosition': function(coordinates, size)
+                {
+                    log.innerHTML += 'onPosition fired<br />';
                 }
             });
     });
-    
-Requirements
-------------
-
-This class makes use of functions already existing in More's String.Extras package, yet they have been re-implemented (with changes to underlying changes) in order to remove the dependancy.
