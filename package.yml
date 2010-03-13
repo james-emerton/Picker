@@ -2,4 +2,5 @@ name: Picker
 author: sixtyseconds
 category: forms
 tags: [forms, time, interface, timepicker, datepicker, picker]
+demo: http://jsfiddle.net/sixtyseconds/HKss9/
 current: 0.1
