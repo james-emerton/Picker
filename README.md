@@ -3,7 +3,7 @@ Picker
 
 This class is the basis for TimePicker, ColorPicker and DatePicker classes.
 
-![Screenshot](http://www.sixtyseconds.co.za/playground/picker/screen.png)
+![Screenshot](http://github.com/sixtyseconds/Picker/raw/master/screen.png)
 
 How to use
 ----------
