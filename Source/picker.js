@@ -25,6 +25,7 @@ requires:
 			*/
 			'prefix': 'picker-',
 			'zIndex': 1,
+            'triggerEvent': 'click',
 			'position':
 			{
 				'left': 'right',
@@ -70,14 +71,16 @@ requires:
 			self.iframe = iframe;
 			self.container = container;
 
-			trigger.addEvent('click', function(e) {
-				self.fireEvent('trigger', [e]);
-				self.show();
-			});
+            if(this.options.triggerEvent) {
+                trigger.addEvent(this.options.triggerEvent, function(e) {
+                    self.fireEvent('trigger', [e]);
+                    self.show();
+                });
+            }
 
-			container.addEvent('click', function(e) {
-				self.fireEvent('click', [e]);
-			});
+            container.addEvent('click', function(e) {
+                self.fireEvent('click', [e]);
+            });
 
 			self.fireEvent('load');
 		},
