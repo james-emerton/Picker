@@ -26,6 +26,7 @@ requires:
 			'prefix': 'picker-',
 			'zIndex': 1,
             'triggerEvent': 'click',
+            'delegates': null,
 			'position':
 			{
 				'left': 'right',
@@ -71,8 +72,18 @@ requires:
 			self.iframe = iframe;
 			self.container = container;
 
-            if(this.options.triggerEvent) {
-                trigger.addEvent(this.options.triggerEvent, function(e) {
+            if(self.options.delegates) {
+                var events = { };
+                events[self.options.delegates] = function(e) {
+                        self.fireEvent('trigger', [e]);
+                        self.show(e.target);
+                };
+
+                // Use event delegation to bind activation event
+                trigger.delegateEvent(self.options.triggerEvent, events);
+            }
+            else if(self.options.triggerEvent) {
+                trigger.addEvent(self.options.triggerEvent, function(e) {
                     self.fireEvent('trigger', [e]);
                     self.show();
                 });
@@ -84,10 +95,10 @@ requires:
 
 			self.fireEvent('load');
 		},
-		'position': function()
+		'position': function(el)
 		{
 			var self = this,
-				coords = self.trigger.getCoordinates(),
+				coords = el.getCoordinates(),
 				size = self.container
 					.addClass('.picker-sizable')
 					.getSize();
@@ -108,12 +119,14 @@ requires:
 
 			self.fireEvent('position', [coords, size]);
 		},
-		'show': function()
+		'show': function(el)
 		{
+            el = el || this.trigger;
+
 			if (!this.showing)
 			{
 				this.showing = true;            
-				this.position();
+				this.position(el);
 				this.container.morph({
 					'opacity': [1]
 				});

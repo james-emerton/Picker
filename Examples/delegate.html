@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+	<head>
+		<title>Picker</title>
+		<link type="text/css" href="../Source/picker.css" rel="stylesheet" />
+		<style type="text/css">
+			body
+			{
+				padding: 25px;
+				font-family: arial, tahoma, verdana;
+				font-size: 11px;
+			}
+			h1
+			{
+				margin: 0px;
+				padding: 0px;
+				font-size: 14px;
+				font-weight: normal;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Picker</h1>
+        <div id="container">
+            <input type="text" class="picker" /><br />
+        </div>
+        <input type="button" value="New Input" id="addinput" />
+		<div id="log"></div>
+		<script type="text/javascript" src="mootools.1.2.4.js"></script>
+		<script type="text/javascript" src="event.delegation.js"></script>
+		<script type="text/javascript" src="../Source/picker.js"></script>
+		<script type="text/javascript">
+			window.addEvent('domready', function() {
+                document.id('addinput').addEvent('click', function() {
+                    new Element('input', {'class': 'picker'}).inject(container);
+                    new Element('br').inject(container);
+                });
+
+				var log = document.id('log'),
+					picker = new Picker(document.id('container'), {
+                        'triggerEvent': 'click',
+                        'delegates': 'input.picker',
+						'onTrigger': function(e)
+						{
+							e.stop();
+							log.innerHTML += 'onTrigger fired<br />';
+						},
+						'onLoad': function()
+						{
+							log.innerHTML += 'onLoad fired<br />';
+						},
+						'onClick': function(e)
+						{
+							log.innerHTML += 'onClick fired<br />';
+							picker.hide();
+						},
+						'onShow': function()
+						{
+							log.innerHTML += 'onShow fired<br />';
+						},
+						'onHide': function()
+						{
+							log.innerHTML += 'onHide fired<br />';
+						},
+						'onPosition': function(coordinates, size)
+						{
+							log.innerHTML += 'onPosition fired<br />';
+						}
+					});
+			});
+		</script>
+	</body>
+</html>
