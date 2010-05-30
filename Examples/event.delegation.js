@@ -50,7 +50,7 @@ Element.implement({
 			this.store(key, stored);
 		}
 	
-		return this.addEvent(type, function(e)
+		var handler = function(e)
 		{
 			// Get target and set defaults
 			var target = document.id(e.target),
@@ -72,7 +72,24 @@ Element.implement({
 			});
             
             return this;
-		});		
+		}
+
+        if(type == 'focus' || type == 'blur')
+        {
+            // Cobbled together from parts of MooTools...
+            var self = this,
+                wrapper = function(event) {
+                    event = new Event(event, self.getWindow());
+                    handler.call(self, event);
+                };
+
+            if(Browser.Engine.trident)
+                this.attachEvent(type == 'focus' ? 'onfocusin' : 'onfocusout', wrapper);
+            else
+                this.addEventListener(type, wrapper, true);
+        }
+        else
+            return this.addEvent(type, handler);
 	},
     
     'delegateEvents': function(delegates, prevent, propagate)
