@@ -1,133 +1,133 @@
 /*
 ---
 description: Better event delegation for MooTools.
-
 license: MIT-style
-
-authors:
-- Christopher Pitt
-- Arieh Glazer
-
-requires:
-- core/1.2.4: Element.Event
-- core/1.2.4: Selectors
-
+authors: [Christopher Pitt, Arieh Glazer, James Emerton]
 provides: [Element.delegateEvent, Element.delegateEvents, Element.denyEvent, Element.denyEvents]
-
+requires: 
+  core/1.2.4: [Element.Event, Selectors]
 ...
 */
 
-Element.implement({
-	'delegateEvent': function(type, delegates, prevent, propagate)
-	{	
-		//get stored delegates
-		var key = type + '-delegates',
-			stored = this.retrieve(key) || false;
-		
-		// if stored delegates; extend with
-		// new delegates and return self.
-		if (stored)
+(function(context) {
+
+	var each = function(collection, fn, context)
+	{
+		for (var key in collection)
 		{
-            Hash.each(delegates, function(fn, selector) {
-                if (stored[selector])
-                {
-                    stored[selector].push(fn);
-                }
-                else
-                {
-                    stored[selector] = [fn];
-                }
-            });
-            
-            return this;
+			if (collection.hasOwnProperty(key))
+			{
+				fn.apply((context || this), [key, collection[key]]);
+			}
 		}
-		else
+		return collection;
+	};
+
+	Element.implement({
+		'delegateEvent': function(type, delegates, prevent, propagate)
 		{
-            stored = new Hash();
-            Hash.each(delegates, function(fn, selector) {
-                stored[selector] = [fn];
-            });
-			this.store(key, stored);
-		}
-	
-		var handler = function(e)
-		{
-			// Get target and set defaults
-			var target = document.id(e.target),
-				prevent = prevent || true,
-				propagate = propagate || false
-				stored = this.retrieve(key),
-                args = arguments;
-	
-			// Cycle through rules
-            Hash.each(stored, function(delegates, selector){
-				if (target.match(selector)){
-					if (prevent) e.preventDefault();
-					if (!propagate) e.stopPropagation();
- 
-					Array.each(delegates, function(fn) {
-						if (fn.apply) fn.apply(target, args);
-					});
+			//get stored delegates
+			var self = this,
+				key = 'delegates:' + type,
+				stored = this.retrieve(key) || false,
+				handler = function(e)
+				{
+					// Get target and set defaults
+					var target = document.id(e.target),
+						prevent = prevent || true,
+						propagate = propagate || false
+						stored = self.retrieve(key),
+						args = arguments;
+
+					// Cycle through rules
+					each(stored, function(selector, delegates) {
+						if (target.match(selector))
+						{
+							if (prevent) e.preventDefault();
+							if (!propagate) e.stopPropagation();
+							each(delegates, function(key, fn) {
+								fn.apply && fn.apply(target, args);
+							});
+						}
+					}, self);
+					return self;
+				};
+
+			// if stored delegates; extend with new delegates and return self.
+			if (stored)
+			{
+				each(delegates, function(selector, fn) {
+					(stored[selector]) ? stored[selector].push(fn) : stored[selector] = [fn];
+				});
+				return self;
+			}
+			else
+			{
+				stored = {};
+				each(delegates, function(selector, fn) {
+					stored[selector] = [fn];
+				});
+				self.store(key, stored);
+			}
+
+			// if event type is focus/blur then shim for delegation.
+			if (/focus|blur|change/.test(type))
+			{
+				var wrapper = function(e)
+					{
+						e = new Event(e, self.getWindow());
+						handler.call(self, e);
+					};
+
+				if (Browser.Engine.trident)
+				{
+					// aliased events for (smell)ie...
+					switch (type)
+					{
+						case 'focus':
+							self.attachEvent('onfocusin', wrapper);
+							break;
+						case 'blur':
+							self.attachEvent('onfocusout', wrapper);
+							break;
+						case 'change':
+							self.attachEvent('change', wrapper);
+							break;
+					}
 				}
-			});
-            
-            return this;
+				else
+				{
+					self.addEventListener(type, wrapper, true);
+				}
+			}
+			else
+			{
+				self.addEvent(type, handler);
+			}
+			return self;
+		},
+
+		'delegateEvents': function(delegates, prevent, propagate)
+		{
+			each(delegates, function(key, delegate) {
+				this.delegateEvent(key, delegate, prevent, propagate);
+			}, this);
+			return this;
+		},
+
+		'denyEvent': function(type, selector, fn)
+		{
+			var stored = this.retrieve('delegates:' + type) || false;
+			stored && stored[selector] && stored[selector].erase(fn);
+			return this;
+		},
+
+		'denyEvents': function(type, selector)
+		{
+			var stored = this.retrieve('delegates:' + type) || false;
+			stored && stored[selector] && delete stored[selector];
+			return this;
 		}
+	});
 
-        if(type == 'focus' || type == 'blur')
-        {
-            // Cobbled together from parts of MooTools...
-            var self = this,
-                wrapper = function(event) {
-                    event = new Event(event, self.getWindow());
-                    handler.call(self, event);
-                };
-
-            if(Browser.Engine.trident)
-                this.attachEvent(type == 'focus' ? 'onfocusin' : 'onfocusout', wrapper);
-            else
-                this.addEventListener(type, wrapper, true);
-        }
-        else
-            return this.addEvent(type, handler);
-	},
-    
-    'delegateEvents': function(delegates, prevent, propagate)
-    {
-        for (key in delegates)
-        {
-            this.delegateEvent(key, delegates[key], prevent, propagate);
-        }
-        
-        return this;
-    },
-    
-    'denyEvent': function(type, selector, fn)
-    {
-        var key = type + '-delegates',
-            stored = this.retrieve(key) || false;
-            
-        if (stored && stored[selector])
-        {
-            stored[selector].erase(fn);
-        }
-        
-        return this;
-    },
-    
-    'denyEvents': function(type, selector)
-    {
-        var key = type + '-delegates',
-            stored = this.retrieve(key) || false;
-            
-        if (stored && stored[selector])
-        {
-            delete stored[selector];
-        }
-        
-        return this;
-    }
-});
-
-Element.alias('delegateEvent','relayEvent');
-Element.alias('delegateEvents','relayEvents');
+})(window ? window : this);
