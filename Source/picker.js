@@ -71,6 +71,7 @@ requires:
 			self.trigger = trigger;
 			self.iframe = iframe;
 			self.container = container;
+            self.currentElement = null;
 
             if(self.options.delegates) {
                 var events = { };
@@ -95,10 +96,10 @@ requires:
 
 			self.fireEvent('load');
 		},
-		'position': function(el)
+		'position': function()
 		{
 			var self = this,
-				coords = el.getCoordinates(),
+				coords = this.currentElement.getCoordinates(),
 				size = self.container
 					.addClass('.picker-sizable')
 					.getSize();
@@ -123,10 +124,15 @@ requires:
 		{
             el = el || this.trigger;
 
+            if(this.showing && el != this.currentElement)
+                this.hide();
+
+            this.currentElement = el;
+
 			if (!this.showing)
 			{
-				this.showing = true;            
-				this.position(el);
+				this.showing = true;
+				this.position();
 				this.container.morph({
 					'opacity': [1]
 				});
