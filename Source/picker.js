@@ -136,8 +136,8 @@ requires:
 				this.container.morph({
 					'opacity': [1]
 				});
-				this.fireEvent('show');
-		}
+				this.fireEvent('show', [this.currentElement]);
+            }
 		},
 		'hide': function()
 		{
@@ -145,7 +145,7 @@ requires:
 			this.container.morph({
 				'opacity': [0]
 			});
-			this.fireEvent('hide');
+			this.fireEvent('hide', [this.currentElement]);
 		}
 	});
 
